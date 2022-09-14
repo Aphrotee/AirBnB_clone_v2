@@ -9,10 +9,8 @@ class Amenity(BaseModel, Base):
     """Amenity class to store amenities of each place"""
     __tablename__ = 'amenities'
     name = Column(String(128), nullable=False)
-    place_amenities = relationship('Review',
-                                   secondary='place_amenity',
-                                   backref='amenity')
-
+    # place_amenities = relationship('Place', secondary='place_amenity', backref='places')
     def __init__(self, *args, **kwargs):
+        """initialize class instance"""
         self.name = kwargs['name']
         super().__init__(*args)

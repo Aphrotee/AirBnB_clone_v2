@@ -13,12 +13,14 @@ class State(BaseModel, Base):
     cities = relationship('City', backref='state', cascade='all, delete')
 
     def __init__(self, *args, **kwargs):
+        """initialize class instance"""
         self.name = kwargs['name']
         super().__init__(*args)
 
     if environ['HBNB_TYPE_STORAGE'] != 'db':
         @property
         def cities(self):
+            """City getter"""
             from models import storage
             city_obj = storage.all(City)
             ret = []

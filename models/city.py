@@ -14,6 +14,7 @@ class City(BaseModel, Base):
     places = relationship('Place', cascade='all, delete', backref='cities')
 
     def __init__(self, *args, **kwargs):
+        """initialize class instance"""
         if 'name' in kwargs:
             self.name = kwargs['name']
         else:

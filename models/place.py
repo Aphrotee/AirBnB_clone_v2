@@ -6,12 +6,13 @@ from sqlalchemy.orm import relationship
 from os import environ
 
 
-metadata = Base.metadata
-place_amenity = Table('place_amenity', metadata,
+place_amenity = Table('place_amenity', Base.metadata,
                       Column('place_id', String(60),
-                             ForeignKey('places.id')),
+                             ForeignKey('places.id'),
+                             primary_key=True, nullable=False),
                       Column('amenity_id', String(60),
-                             ForeignKey('amenities.id')))
+                             ForeignKey('amenities.id'),
+                             primary_key=True, nullable=False))
 
 
 class Place(BaseModel, Base):
@@ -29,19 +30,25 @@ class Place(BaseModel, Base):
     longitude = Column(Float, nullable=True)
     amenity_ids = []
     reviews = relationship('Review', backref='place', cascade='all, delete')
-    amenities = relationship('Amenity', secondary='place_amenity',
-                             viewonly=False, backref='place')
+    amenities = relationship('Amenity', backref='place_amenities',
+                             secondary='place_amenity',
+                             viewonly=False)
 
     def __init__(self, *args, **kwargs):
+        """initialize class instance"""
         self.city_id = kwargs['city_id']
         self.user_id = kwargs['user_id']
         self.name = kwargs['name']
         if 'description' in kwargs:
             self.description = kwargs['description']
-        self.number_rooms = kwargs['number_rooms']
-        self.number_bathrooms = kwargs['number_bathrooms']
-        self.max_guest = kwargs['max_guest']
-        self.price_by_night = kwargs['price_by_night']
+        if 'number_rooms' in kwargs:
+            self.number_rooms = kwargs['number_rooms']
+        if 'number_bathrooms' in kwargs:
+            self.number_bathrooms = kwargs['number_bathrooms']
+        if 'max_guest' in kwargs:
+            self.max_guest = kwargs['max_guest']
+        if 'price_by_night' in kwargs:
+            self.price_by_night = kwargs['price_by_night']
         if 'latitude' in kwargs:
             self.latitude = kwargs['latitude']
         if 'longitude' in kwargs:
@@ -51,6 +58,7 @@ class Place(BaseModel, Base):
     if environ['HBNB_TYPE_STORAGE'] != 'db':
         @property
         def reviews(self):
+            """Review setter"""
             from models import storage
             review_obj = storage.all(Review)
             ret = []
@@ -61,6 +69,7 @@ class Place(BaseModel, Base):
 
         @property
         def amenities(self):
+            """Amenities getter"""
             from models import storage
             amenity_obj = storage.all(Amenity)
             ret = []
@@ -71,5 +80,6 @@ class Place(BaseModel, Base):
 
         @amenities.setter
         def amenities(self, obj):
+            """Amenities setter"""
             if type(obj).__name__ == 'Amenity':
                 self.amenity_ids.append(obj.id)

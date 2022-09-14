@@ -12,6 +12,7 @@ class Review(BaseModel, Base):
     text = Column(String(1024), nullable=False)
 
     def __init__(self, *args, **kwargs):
+        """initialize class instance"""
         self.place_id = kwargs['place_id']
         self.user_id = kwargs['user_id']
         self.text = kwargs['text']

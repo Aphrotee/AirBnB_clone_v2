@@ -10,14 +10,17 @@ class User(BaseModel, Base):
     __tablename__ = 'users'
     email = Column(String(128), nullable=False)
     password = Column(String(128), nullable=False)
-    first_name = Column(String(128), nullable=False)
-    last_name = Column(String(128), nullable=False)
+    first_name = Column(String(128), nullable=True)
+    last_name = Column(String(128), nullable=True)
     places = relationship('Place', backref='user', cascade='all, delete')
     reviews = relationship('Review', backref='user', cascade='all, delete')
 
     def __init__(self, *args, **kwargs):
+        """initialize class instance"""
         self.email = kwargs['email']
         self.password = kwargs['password']
-        self.first_name = kwargs['first_name']
-        self.last_name = kwargs['last_name']
+        if 'first_name' in kwargs:
+            self.first_name = kwargs['first_name']
+        if 'last_name' in kwargs:
+            self.last_name = kwargs['last_name']
         super().__init__(*args)
