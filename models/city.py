@@ -18,9 +18,9 @@ class City(BaseModel, Base):
         if 'name' in kwargs:
             self.name = kwargs['name']
         else:
-            self.name = "*no name*"
+            self.name = ''
         if 'state_id' in kwargs:
             self.state_id = kwargs['state_id']
         else:
-            self.state_id = "*no state_id*"
+            self.state_id = ''
         super().__init__(*args)

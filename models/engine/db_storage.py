@@ -7,7 +7,7 @@ database storage for hbnb clone
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
-import os
+from os import getenv
 from models.base_model import Base
 from models.amenity import Amenity
 from models.city import City
@@ -28,10 +28,10 @@ class DBStorage:
     def __init__(self):
         """Creates the database storage engine"""
         self.__engine = create_engine('mysql+mysqldb://{}:{}@{}/{}'.format(
-                                      os.environ['HBNB_MYSQL_USER'],
-                                      os.environ['HBNB_MYSQL_PWD'],
-                                      os.environ['HBNB_MYSQL_HOST'],
-                                      os.environ['HBNB_MYSQL_DB']),
+                                      getenv('HBNB_MYSQL_USER'),
+                                      getenv('HBNB_MYSQL_PWD'),
+                                      getenv('HBNB_MYSQL_HOST'),
+                                      getenv('HBNB_MYSQL_DB')),
                                       pool_pre_ping=True)
         if 'HBNB_ENV' in os.environ:
             if os.environ['HBNB_ENV'] == 'test':

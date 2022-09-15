@@ -3,7 +3,7 @@
 from models.base_model import BaseModel, Base
 from sqlalchemy import Column, String
 from sqlalchemy.orm import relationship
-from os import environ
+from os import getenv
 
 
 class State(BaseModel, Base):
@@ -14,10 +14,13 @@ class State(BaseModel, Base):
 
     def __init__(self, *args, **kwargs):
         """initialize class instance"""
-        self.name = kwargs['name']
+        if 'name' in kwargs.keys():
+            self.name = kwargs['name']
+        else:
+            self.name = ''
         super().__init__(*args)
 
-    if environ['HBNB_TYPE_STORAGE'] != 'db':
+    if getenv('HBNB_TYPE_STORAGE') != 'db':
         @property
         def cities(self):
             """City getter"""

@@ -3,7 +3,7 @@
 from models.base_model import BaseModel, Base
 from sqlalchemy import Column, String, Integer, Float, ForeignKey, Table
 from sqlalchemy.orm import relationship
-from os import environ
+from os import getenv
 
 
 place_amenity = Table('place_amenity', Base.metadata,
@@ -36,26 +36,35 @@ class Place(BaseModel, Base):
 
     def __init__(self, *args, **kwargs):
         """initialize class instance"""
-        self.city_id = kwargs['city_id']
-        self.user_id = kwargs['user_id']
-        self.name = kwargs['name']
-        if 'description' in kwargs:
+        if 'city_id' in kwargs.keys():
+            self.city_id = kwargs['city_id']
+        else:
+            self.city_id = ''
+        if 'user_id' in kwargs.keys():
+            self.user_id = kwargs['user_id']
+        else:
+            self.user_id = ''
+        if 'name' in kwargs.keys():
+            self.name = kwargs['name']
+        else:
+            self.name = ''
+        if 'description' in kwargs.keys():
             self.description = kwargs['description']
-        if 'number_rooms' in kwargs:
+        if 'number_rooms' in kwargs.keys():
             self.number_rooms = kwargs['number_rooms']
-        if 'number_bathrooms' in kwargs:
+        if 'number_bathrooms' in kwargs.keys():
             self.number_bathrooms = kwargs['number_bathrooms']
-        if 'max_guest' in kwargs:
+        if 'max_guest' in kwargs.keys():
             self.max_guest = kwargs['max_guest']
-        if 'price_by_night' in kwargs:
+        if 'price_by_night' in kwargs.keys():
             self.price_by_night = kwargs['price_by_night']
-        if 'latitude' in kwargs:
+        if 'latitude' in kwargs.keys():
             self.latitude = kwargs['latitude']
-        if 'longitude' in kwargs:
+        if 'longitude' in kwargs.keys():
             self.longitude = kwargs['longitude']
         super().__init__(*args)
 
-    if environ['HBNB_TYPE_STORAGE'] != 'db':
+    if getenv('HBNB_TYPE_STORAGE') != 'db':
         @property
         def reviews(self):
             """Review setter"""

@@ -16,6 +16,8 @@ class FileStorage:
             for key, value in FileStorage.__objects.items():
                 ob_name = key.split('.')
                 if ob_name[0] == name:
+                    if '_sa_instance_state' in value.__dict__.keys():
+                        del value.__dict__['_sa_instance_state']
                     ret[key] = value
             return ret
         return FileStorage.__objects

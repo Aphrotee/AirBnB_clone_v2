@@ -17,8 +17,14 @@ class User(BaseModel, Base):
 
     def __init__(self, *args, **kwargs):
         """initialize class instance"""
-        self.email = kwargs['email']
-        self.password = kwargs['password']
+        if 'email' in kwargs.keys():
+            self.email = kwargs['email']
+        else:
+            self.email = ''
+        if 'password' in kwargs.keys():
+            self.password = kwargs['password']
+        else:
+            self.password = ''
         if 'first_name' in kwargs:
             self.first_name = kwargs['first_name']
         if 'last_name' in kwargs:
