@@ -6,13 +6,24 @@ from sqlalchemy.orm import relationship
 from os import getenv
 
 
-place_amenity = Table('place_amenity', Base.metadata,
+"""place_amenity = Table('place_amenity', Base.metadata,
                       Column('place_id', String(60),
                              ForeignKey('places.id'),
                              primary_key=True, nullable=False),
                       Column('amenity_id', String(60),
                              ForeignKey('amenities.id'),
-                             primary_key=True, nullable=False))
+                             primary_key=True, nullable=False))"""
+
+
+class PlaceAmenity(Base):
+    """place_amenities table"""
+    __tablename__ = 'place_amenity'
+    place_id = Column(String(60),
+                      ForeignKey('places.id'),
+                      primary_key=True, nullable=False)
+    amenities_id = Column(String(60),
+                          ForeignKey('amenities.id'),
+                          primary_key=True, nullable=False)
 
 
 class Place(BaseModel, Base):
@@ -29,47 +40,23 @@ class Place(BaseModel, Base):
     latitude = Column(Float, nullable=True)
     longitude = Column(Float, nullable=True)
     amenity_ids = []
-    reviews = relationship('Review', backref='place', cascade='all, delete')
-    amenities = relationship('Amenity', backref='place_amenities',
-                             secondary='place_amenity',
-                             viewonly=False)
+    if getenv('HBNB_TYPE_STORAGE') == 'db':
+        reviews = relationship('Review', backref='place',
+                               cascade='all, delete')
+        amenities = relationship('Amenity',
+                                 secondary='place_amenity',
+                                 viewonly=True)
 
     def __init__(self, *args, **kwargs):
         """initialize class instance"""
-        if 'city_id' in kwargs.keys():
-            self.city_id = kwargs['city_id']
-        else:
-            self.city_id = ''
-        if 'user_id' in kwargs.keys():
-            self.user_id = kwargs['user_id']
-        else:
-            self.user_id = ''
-        if 'name' in kwargs.keys():
-            self.name = kwargs['name']
-        else:
-            self.name = ''
-        if 'description' in kwargs.keys():
-            self.description = kwargs['description']
-        if 'number_rooms' in kwargs.keys():
-            self.number_rooms = kwargs['number_rooms']
-        if 'number_bathrooms' in kwargs.keys():
-            self.number_bathrooms = kwargs['number_bathrooms']
-        if 'max_guest' in kwargs.keys():
-            self.max_guest = kwargs['max_guest']
-        if 'price_by_night' in kwargs.keys():
-            self.price_by_night = kwargs['price_by_night']
-        if 'latitude' in kwargs.keys():
-            self.latitude = kwargs['latitude']
-        if 'longitude' in kwargs.keys():
-            self.longitude = kwargs['longitude']
-        super().__init__(*args)
+        super().__init__(*args, **kwargs)
 
     if getenv('HBNB_TYPE_STORAGE') != 'db':
         @property
         def reviews(self):
             """Review setter"""
             from models import storage
-            review_obj = storage.all(Review)
+            review_obj = storage.all('Review')
             ret = []
             for key, value in review_obj.items():
                 if self.id == value.place_id:
@@ -80,7 +67,7 @@ class Place(BaseModel, Base):
         def amenities(self):
             """Amenities getter"""
             from models import storage
-            amenity_obj = storage.all(Amenity)
+            amenity_obj = storage.all('Amenity')
             ret = []
             for key, value in amenity_obj.items():
                 if value.id in self.amenity_ids:
@@ -88,7 +75,8 @@ class Place(BaseModel, Base):
             return ret
 
         @amenities.setter
-        def amenities(self, obj):
+        def amenities(self, obj=None):
             """Amenities setter"""
+            print("in setter")
             if type(obj).__name__ == 'Amenity':
                 self.amenity_ids.append(obj.id)

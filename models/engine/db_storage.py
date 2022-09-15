@@ -33,9 +33,8 @@ class DBStorage:
                                       getenv('HBNB_MYSQL_HOST'),
                                       getenv('HBNB_MYSQL_DB')),
                                       pool_pre_ping=True)
-        if 'HBNB_ENV' in os.environ:
-            if os.environ['HBNB_ENV'] == 'test':
-                Base.metadata.drop_all(self.__engine)
+    if getenv('HBNB_ENV') == 'test':
+        Base.metadata.drop_all(self.__engine)
 
     def all(self, cls=None):
         """
@@ -46,6 +45,7 @@ class DBStorage:
         objs = []
         obj_dict = {}
         if cls is not None:
+            cls = eval(cls)
             objs.append(self.__session.query(cls))
         else:
             for cls_name in self.classes:

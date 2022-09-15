@@ -12,8 +12,4 @@ class Amenity(BaseModel, Base):
 
     def __init__(self, *args, **kwargs):
         """initialize class instance"""
-        if 'name' in kwargs.keys():
-            self.name = kwargs['name']
-        else:
-            self.name = ''
-        super().__init__(*args)
+        super().__init__(*args, **kwargs)

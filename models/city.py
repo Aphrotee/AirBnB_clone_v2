@@ -15,12 +15,4 @@ class City(BaseModel, Base):
 
     def __init__(self, *args, **kwargs):
         """initialize class instance"""
-        if 'name' in kwargs:
-            self.name = kwargs['name']
-        else:
-            self.name = ''
-        if 'state_id' in kwargs:
-            self.state_id = kwargs['state_id']
-        else:
-            self.state_id = ''
-        super().__init__(*args)
+        super().__init__(*args, **kwargs)

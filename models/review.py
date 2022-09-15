@@ -13,16 +13,4 @@ class Review(BaseModel, Base):
 
     def __init__(self, *args, **kwargs):
         """initialize class instance"""
-        if 'place_id' in kwargs.keys():
-            self.place_id = kwargs['place_id']
-        else:
-            self.place_id = ''
-        if 'user_id' in kwargs.keys():
-            self.user_id = kwargs['user_id']
-        else:
-            self.user_id = ''
-        if 'text' in kwargs.keys():
-            self.text = kwargs['text']
-        else:
-            self.text = ''
-        super().__init__(*args)
+        super().__init__(*args, **kwargs)

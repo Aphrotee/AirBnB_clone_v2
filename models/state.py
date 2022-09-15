@@ -14,18 +14,14 @@ class State(BaseModel, Base):
 
     def __init__(self, *args, **kwargs):
         """initialize class instance"""
-        if 'name' in kwargs.keys():
-            self.name = kwargs['name']
-        else:
-            self.name = ''
-        super().__init__(*args)
+        super().__init__(*args, **kwargs)
 
     if getenv('HBNB_TYPE_STORAGE') != 'db':
         @property
         def cities(self):
             """City getter"""
             from models import storage
-            city_obj = storage.all(City)
+            city_obj = storage.all('City')
             ret = []
             for key, value in city_obj.items():
                 if self.id == value.state_id:

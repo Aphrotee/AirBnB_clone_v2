@@ -162,8 +162,8 @@ class HBNBCommand(cmd.Cmd):
             attr[name] = val
         new_instance = HBNBCommand.classes[arg[0]](**attr)
         if len(attr):
-            new_instance.save()
             new_instance.__dict__.update(attr)
+        new_instance.save()
         storage.save()
         print(new_instance.id)
 
@@ -197,7 +197,7 @@ class HBNBCommand(cmd.Cmd):
 
         key = c_name + "." + c_id
         try:
-            print(storage._FileStorage__objects[key])
+            print(storage.all()[key])
         except KeyError:
             print("** no instance found **")
 
