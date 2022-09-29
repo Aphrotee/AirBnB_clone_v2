@@ -15,7 +15,7 @@ def do_pack():
     """
     Packs all web_static files into an archive.
     """
-    time =  datetime.now().strftime("%Y%m%d%H%M%S")
+    time = datetime.now().strftime("%Y%m%d%H%M%S")
     versions = '/root/AirBnB_clone_v2/versions'
     if not os.path.exists(versions):
         os.makedirs(versions)
