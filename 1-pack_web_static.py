@@ -21,3 +21,7 @@ def do_pack():
         os.makedirs(versions)
     archive = 'versions/web_static_' + time + '.tgz'
     local("tar -cvzf {} web_static".format(archive))
+    if os.path.exists(archive):
+        return archive
+    else:
+        return

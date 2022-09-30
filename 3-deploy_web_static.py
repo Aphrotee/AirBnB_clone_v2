@@ -4,6 +4,7 @@ This is a Fabric script that generates a .tgz archive from
 the contents of the web_static folder of your AirBnB Clone
 repo, using the function do_pack and distributes an archive
 to your web servers, using the function do_deploy.
+The function deploy automates it all.
 """
 
 
@@ -25,6 +26,10 @@ def do_pack():
         os.makedirs(versions)
     archive = 'versions/web_static_' + time + '.tgz'
     local("tar -cvzf {} web_static".format(archive))
+    if os.path.exists(archive):
+        return archive
+    else:
+        return
 
 
 def do_deploy(archive_path):
@@ -58,3 +63,12 @@ def do_deploy(archive_path):
     if res.failed:
         return False
     return True
+
+def deploy():
+    """
+    Automates the whole deployment process
+    """
+    path = do_pack()
+    if path is not None:
+        ret = do_deploy(path)
+    return ret
