@@ -1,74 +1,81 @@
 #!/usr/bin/python3
+"""Deploy web static package
 """
-This is a Fabric script that generates a .tgz archive from
-the contents of the web_static folder of your AirBnB Clone
-repo, using the function do_pack and distributes an archive
-to your web servers, using the function do_deploy.
-The function deploy automates it all.
-"""
-
-
-from fabric.api import local, put, run, env
-import os
+from fabric.api import *
 from datetime import datetime
+from os import path
 
 
-env.hosts = ['34.239.151.121', '3.239.91.139']
+env.hosts = ['18.209.20.255', '34.73.76.135']
+env.user = 'ubuntu'
+env.key_filename = '~/.ssh/id_rsa'
 
 
 def do_pack():
-    """
-    Packs all web_static files into an archive.
-    """
-    time = datetime.now().strftime("%Y%m%d%H%M%S")
-    versions = '/root/AirBnB_clone_v2/versions'
-    if not os.path.exists(versions):
-        os.makedirs(versions)
-    archive = 'versions/web_static_' + time + '.tgz'
-    local("tar -cvzf {} web_static".format(archive))
-    if os.path.exists(archive):
-        return archive
-    else:
-        return
+        """Function to compress directory
+        Return: path to archive on success; None on fail
+        """
+        # Get current time
+        now = datetime.now()
+        now = now.strftime('%Y%m%d%H%M%S')
+        archive_path = 'versions/web_static_' + now + '.tgz'
+
+        # Create archive
+        local('mkdir -p versions/')
+        result = local('tar -cvzf {} web_static/'.format(archive_path))
+
+        # Check if archiving was successful
+        if result.succeeded:
+                return archive_path
+        return None
 
 
 def do_deploy(archive_path):
-    """
-    Deploys web_static archive onto the servers.
-    """
-    if not os.path.exists(archive_path):
-        return False
-    up = put(archive_path, '/tmp/')
-    if up.failed:
-        return False
-    server_arch = '/tmp' + archive_path[-30:]
-    deploy_path = '/data/web_static/releases' + archive_path[-30:-4] + '/'
-    res = run('mkdir -p {}'.format(deploy_path))
-    if res.failed:
-        return False
-    res = run('tar -zxf {} -C {}'.format(server_arch, deploy_path))
-    if res.failed:
-        return False
-    res = run('rm {}'.format(server_arch))
-    if res.failed:
-        return False
-    res = run('cp -r {}web_static/* {}'.format(deploy_path, deploy_path))
-    if res.failed:
-        return False
-    res = run('rm -rf /data/web_static/current {}web_static/'.format(
-            deploy_path))
-    if res.failed:
-        return False
-    res = run('ln -s {} /data/web_static/current'.format(deploy_path))
-    if res.failed:
-        return False
-    return True
+        """Deploy web files to server
+        """
+        try:
+                if not (path.exists(archive_path)):
+                        return False
+
+                # upload archive
+                put(archive_path, '/tmp/')
+
+                # create target dir
+                timestamp = archive_path[-18:-4]
+                run('sudo mkdir -p /data/web_static/\
+releases/web_static_{}/'.format(timestamp))
+
+                # uncompress archive and delete .tgz
+                run('sudo tar -xzf /tmp/web_static_{}.tgz -C \
+/data/web_static/releases/web_static_{}/'
+                    .format(timestamp, timestamp))
+
+                # remove archive
+                run('sudo rm /tmp/web_static_{}.tgz'.format(timestamp))
+
+                # move contents into host web_static
+                run('sudo mv /data/web_static/releases/web_static_{}/web_static/* \
+/data/web_static/releases/web_static_{}/'.format(timestamp, timestamp))
+
+                # remove extraneous web_static dir
+                run('sudo rm -rf /data/web_static/releases/\
+web_static_{}/web_static'
+                    .format(timestamp))
+
+                # delete pre-existing sym link
+                run('sudo rm -rf /data/web_static/current')
+
+                # re-establish symbolic link
+                run('sudo ln -s /data/web_static/releases/\
+web_static_{}/ /data/web_static/current'.format(timestamp))
+        except:
+                return False
+
+        # return True on success
+        return True
+
 
 def deploy():
-    """
-    Automates the whole deployment process
-    """
-    path = do_pack()
-    if path is not None:
-        ret = do_deploy(path)
-    return ret
+        """Deploy web static
+        """
+        return do_deploy(do_pack())
