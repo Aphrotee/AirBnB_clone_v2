@@ -14,6 +14,7 @@ from datetime import datetime
 
 env.hosts = ['34.239.151.121', '3.239.91.139']
 
+
 def do_deploy(archive_path):
         """Deploy web files to server
         """
