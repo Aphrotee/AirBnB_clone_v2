@@ -10,17 +10,20 @@ from fabric.api import local
 import os
 from datetime import datetime
 
-
 def do_pack():
+    """Function to compress directory
+    Return: path to archive on success; None on fail
     """
-    Packs all web_static files into an archive.
-    """
-    time = datetime.now().strftime("%Y%m%d%H%M%S")
-    versions = '/root/AirBnB_clone_v2/versions'
-    if not os.path.exists(versions):
-        os.makedirs(versions)
-    archive = 'versions/web_static_' + time + '.tgz'
-    res = local("tar -cvzf {} web_static/".format(archive))
-    if res.succeeded:
-        return archive
+    # Get current time
+    now = datetime.now()
+    now = now.strftime('%Y%m%d%H%M%S')
+    archive_path = 'versions/web_static_' + now + '.tgz'
+
+    # Create archive
+    local('mkdir -p versions/')
+    result = local('tar -cvzf {} web_static/'.format(archive_path))
+
+    # Check if archiving was successful
+    if result.succeeded:
+        return archive_path
     return None
