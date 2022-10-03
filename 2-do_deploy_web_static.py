@@ -14,51 +14,46 @@ from datetime import datetime
 
 env.hosts = ['34.239.151.121', '3.239.91.139']
 
-
-def do_pack():
-    """
-    Packs all web_static files into an archive.
-    """
-    time = datetime.now().strftime("%Y%m%d%H%M%S")
-    versions = '/root/AirBnB_clone_v2/versions'
-    if not os.path.exists(versions):
-        os.makedirs(versions)
-    archive = 'versions/web_static_' + time + '.tgz'
-    local("tar -cvzf {} web_static".format(archive))
-    if os.path.exists(archive):
-        return archive
-    else:
-        return
-
-
 def do_deploy(archive_path):
-    """
-    Deploys web_static archive onto the servers.
-    """
-    if not os.path.exists(archive_path):
-        return False
-    up = put(archive_path, '/tmp/')
-    if up.failed:
-        return False
-    server_arch = '/tmp' + archive_path[-30:]
-    deploy_path = '/data/web_static/releases' + archive_path[-30:-4] + '/'
-    res = run('mkdir -p {}'.format(deploy_path))
-    if res.failed:
-        return False
-    res = run('tar -zxf {} -C {}'.format(server_arch, deploy_path))
-    if res.failed:
-        return False
-    res = run('rm {}'.format(server_arch))
-    if res.failed:
-        return False
-    res = run('cp -r {}web_static/* {}'.format(deploy_path, deploy_path))
-    if res.failed:
-        return False
-    res = run('rm -rf /data/web_static/current {}web_static/'.format(
-            deploy_path))
-    if res.failed:
-        return False
-    res = run('ln -s {} /data/web_static/current'.format(deploy_path))
-    if res.failed:
-        return False
-    return True
+        """Deploy web files to server
+        """
+        try:
+                if not (path.exists(archive_path)):
+                        return False
+
+                # upload archive
+                put(archive_path, '/tmp/')
+
+                # create target dir
+                timestamp = archive_path[-18:-4]
+                run('sudo mkdir -p /data/web_static/\
+releases/web_static_{}/'.format(timestamp))
+
+                # uncompress archive and delete .tgz
+                run('sudo tar -xzf /tmp/web_static_{}.tgz -C \
+/data/web_static/releases/web_static_{}/'
+                    .format(timestamp, timestamp))
+
+                # remove archive
+                run('sudo rm /tmp/web_static_{}.tgz'.format(timestamp))
+
+                # move contents into host web_static
+                run('sudo mv /data/web_static/releases/web_static_{}/web_static/* \
+/data/web_static/releases/web_static_{}/'.format(timestamp, timestamp))
+
+                # remove extraneous web_static dir
+                run('sudo rm -rf /data/web_static/releases/\
+web_static_{}/web_static'
+                    .format(timestamp))
+
+                # delete pre-existing sym link
+                run('sudo rm -rf /data/web_static/current')
+
+                # re-establish symbolic link
+                run('sudo ln -s /data/web_static/releases/\
+web_static_{}/ /data/web_static/current'.format(timestamp))
+        except:
+                return False
+
+        # return True on success
+        return True
