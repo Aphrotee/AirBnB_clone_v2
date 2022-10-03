@@ -20,8 +20,7 @@ def do_pack():
     if not os.path.exists(versions):
         os.makedirs(versions)
     archive = 'versions/web_static_' + time + '.tgz'
-    local("tar -cvzf {} web_static".format(archive))
-    if os.path.exists(archive):
+    res = local("tar -cvzf {} web_static/".format(archive))
+    if res.succeeded:
         return archive
-    else:
-        return
+    return None
