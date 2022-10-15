@@ -43,6 +43,12 @@ def number_template(n):
     n = int(n)
     return render_template('5-number.html', n=n)
 
+@app.route('/number_odd_or_even/<int:n>')
+def number_odd_or_even(n):
+    """Returns string when queried"""
+    n = int(n)
+    return render_template('6-number_odd_or_even.html', n=n)
+
 if __name__ == '__main__':
     app.url_map.strict_slashes = False
     app.run(host='0.0.0.0', port=5000)

@@ -1,4 +1,5 @@
 #!/bin/bash
+sudo apt-get update
 sudo apt-get -y install pip3
 pip3 uninstall Fabric
 sudo apt-get -y install libffi-dev
