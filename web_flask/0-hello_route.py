@@ -8,7 +8,7 @@ from flask import Flask
 app = Flask(__name__)
 
 
-@app.route('/')
+@app.route('/airbnb-onepage/')
 def hello_hbnb():
     """Returns string when queried"""
     return 'Hello HBNB!'
